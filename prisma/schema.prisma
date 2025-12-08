@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @unique
+  name      String
+  imageUrl  String?
+  email     String    @db.Text
+
+  workspaces Workspace[]
+  documents  Document[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("profiles")
+}
+
+model Workspace {
+  id         String    @id @default(uuid()) @db.Uuid
+  name       String
+  inviteCode String    @unique
+  profileId  String    @db.Uuid
+  profile    Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  documents  Document[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("workspaces")
+}
+
+model Document {
+  id                String    @id @default(uuid()) @db.Uuid
+  title             String
+  profileId         String    @db.Uuid
+  profile           Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  isArchived        Boolean   @default(false)
+  isPublished       Boolean   @default(false)
+
+  content           Json?
+  coverImage        String?
+  icon              String?
+
+  parentDocumentId  String?
+  parentDocument    Document? @relation("ParentChild", fields: [parentDocumentId], references: [id], onDelete: Cascade)
+  childDocuments    Document[] @relation("ParentChild")
+
+  workspaceId       String    @db.Uuid
+  workspace         Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  tasks             Task[]
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([profileId])
+  @@index([profileId, parentDocumentId])
+  @@map("documents")
+}
+
+model Task {
+  id           String   @id @default(uuid()) @db.Uuid
+  content      String
+  isDone       Boolean  @default(false)
+  priority     String   @default("MEDIUM")
+
+  latitude     Float?
+  longitude    Float?
+  locationName String?
+
+  documentId   String
+  document     Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+
+  @@map("tasks")
+}
