@@ -1,15 +1,20 @@
-/**
- * USE-SCROLL-TOP HOOK
- *
- * Custom React hook for detecting when the page has scrolled down.
- * Used in the marketing navbar to add a shadow effect on scroll.
- *
- * Returns:
- * - Boolean: true if scrolled down, false if at top
- *
- * Usage:
- * const scrolled = useScrollTop()
- * className={scrolled ? 'shadow-md' : ''}
- *
- * Location: lib/use-scroll-top.tsx
- */
+import { useState, useEffect } from "react";
+
+export const useScrollTop = (threshold = 10) => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > threshold) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [threshold]);
+
+  return scrolled;
+};

@@ -1,14 +1,12 @@
-/**
- * MARKETING LAYOUT
- *
- * This layout is specifically for the marketing/public pages group.
- * It wraps the Navbar and Footer around all routes within the (marketing) group.
- *
- * Routes served: /, /about, /pricing, etc. (Public landing pages)
- *
- * Components used:
- * - Navbar: Top navigation bar with logo and CTAs
- * - Footer: Bottom footer with links and copyright
- *
- * No authentication required for these routes.
- */
+import { Navbar } from "./_components/navbar";
+
+const MarketingLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="h-full dark:bg-[#1F1F1F]">
+      <Navbar />
+      <main className="h-full pt-40">{children}</main>
+    </div>
+  );
+};
+
+export default MarketingLayout;

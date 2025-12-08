@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     const document = await prisma.document.create({
       data: {
         title: title || "Untitled",
-        parentDocument: parentDocumentId || null,
+        parentDocumentId: parentDocumentId || null,
         profileId: profile.id,
         workspaceId: workspaceId,
         isArchived: false,

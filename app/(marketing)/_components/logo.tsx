@@ -1,12 +1,15 @@
-/**
- * LOGO COMPONENT
- *
- * NEXIO logo component used in the Navbar and Footer.
- * Reusable across the application.
- *
- * Can be:
- * - Text-based logo ("NEXIO")
- * - Image-based logo (SVG or PNG from public folder)
- *
- * Location: app/(marketing)/_components/logo.tsx
- */
+import { Poppins } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const font = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+});
+
+export const Logo = () => {
+  return (
+    <div className="hidden md:flex items-center gap-x-2">
+      <p className={cn("font-semibold text-xl", font.className)}>Nexio</p>
+    </div>
+  );
+};
