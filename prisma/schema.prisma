@@ -49,7 +49,7 @@ model Document {
   coverImage        String?
   icon              String?
 
-  parentDocumentId  String?
+  parentDocumentId  String?   @db.Uuid
   parentDocument    Document? @relation("ParentChild", fields: [parentDocumentId], references: [id], onDelete: Cascade)
   childDocuments    Document[] @relation("ParentChild")
 
@@ -76,7 +76,7 @@ model Task {
   longitude    Float?
   locationName String?
 
-  documentId   String
+  documentId   String   @db.Uuid
   document     Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   createdAt    DateTime @default(now())
