@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { ImageIcon, Smile, X } from "lucide-react";
+import { ImageIcon, Smile, X, Sparkles } from "lucide-react"; // ✅ Added Sparkles
 import TextareaAutosize from "react-textarea-autosize";
 import { Button } from "@/components/ui/button";
 import { useCoverImage } from "@/hooks/use-cover-image";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useDocumentUpdate } from "@/hooks/use-document-update";
+import { useAIChat } from "@/hooks/use-ai-chat"; // ✅ Added import
 
 interface ToolbarProps {
   initialData: {
@@ -21,7 +22,8 @@ interface ToolbarProps {
 export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const updateDocument = useDocumentUpdate(initialData.id);
-  const coverImage = useCoverImage(); // ✅ Initialize the hook
+  const coverImage = useCoverImage();
+  const aiChat = useAIChat(); // ✅ Initialize the hook
 
   const [value, setValue] = useState(initialData.title);
   const [isEditing, setIsEditing] = useState(false);
@@ -87,13 +89,25 @@ export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
         )}
         {!initialData.coverImage && !preview && (
           <Button
-            onClick={coverImage.onOpen} // ✅ Changed from () => {}
+            onClick={coverImage.onOpen}
             className="text-muted-foreground text-xs"
             variant="outline"
             size="sm"
           >
             <ImageIcon className="h-4 w-4 mr-2" />
             Add cover
+          </Button>
+        )}
+        {/* ✅ AI Chat Button */}
+        {!preview && (
+          <Button
+            onClick={aiChat.onOpen}
+            className="text-xs bg-purple-50/50 hover:bg-purple-100 text-purple-600 border-purple-200"
+            variant="outline"
+            size="sm"
+          >
+            <Sparkles className="h-3 w-3 mr-2" />
+            Ask AI
           </Button>
         )}
       </div>

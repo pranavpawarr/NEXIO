@@ -6,6 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { EdgeStoreProvider } from "@/lib/edgestore";
 import { CoverImageModal } from "@/components/modals/cover-image-modal";
+import { AIChatModal } from "@/components/modals/ai-chat-modal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,7 +31,7 @@ export default function RootLayout({
             <EdgeStoreProvider>
               <Toaster position="bottom-center" />
 
-              {/* 2. PLACE IT HERE (Must be inside Body) */}
+              <AIChatModal />
               <CoverImageModal />
 
               {children}
