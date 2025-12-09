@@ -8,7 +8,7 @@ import { QueryProvider } from "@/components/providers/query-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Jotion",
+  title: "Nexio",
   description: "The connected workspace where better, faster work happens.",
   icons: {
     icon: "/favicon.ico",

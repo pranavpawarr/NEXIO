@@ -10,7 +10,7 @@ import {
   Settings,
   Trash,
 } from "lucide-react";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { toast } from "sonner";
@@ -23,11 +23,13 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
+import { useCreateDocument } from "@/hooks/use-create-document";
 
 export const Navigation = () => {
   const router = useRouter();
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const createDocument = useCreateDocument();
 
   const isResizingRef = useRef(false);
   const sidebarRef = useRef<ElementRef<"aside">>(null);
@@ -102,23 +104,15 @@ export const Navigation = () => {
   };
 
   const handleCreate = () => {
-    const promise = fetch("/api/documents", {
-      method: "POST",
-      body: JSON.stringify({ title: "Untitled" }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed");
-        return res.json();
-      })
-      .then((document) => {
-        router.push(`/documents/${document.id}`);
-      });
-
-    toast.promise(promise, {
-      loading: "Creating a new note...",
-      success: "New note created!",
-      error: "Failed to create note.",
-    });
+    createDocument.mutate(
+      { title: "Untitled" },
+      {
+        onSuccess: (data) => {
+          // Redirect to the new page immediately
+          router.push(`/documents/${data.id}`);
+        },
+      }
+    );
   };
 
   return (
