@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { Sparkles, Send, Bot, User, Loader2 } from "lucide-react";
@@ -16,10 +16,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAIChat } from "@/hooks/use-ai-chat";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-// 1. DEFINE THE INTERFACE HERE
+// REMOVED ScrollArea import to use native scrolling
+// import { ScrollArea } from "@/components/ui/scroll-area";
+
 interface DocumentData {
   id: string;
   title: string;
@@ -34,12 +35,12 @@ interface Message {
 export const AIChatModal = () => {
   const chatStore = useAIChat();
   const params = useParams();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 2. PASS THE TYPE TO USEQUERY HERE <DocumentData>
   const { data: document } = useQuery<DocumentData>({
     queryKey: ["document", params.documentId],
     queryFn: async () => {
@@ -49,6 +50,16 @@ export const AIChatModal = () => {
     },
     enabled: !!params.documentId,
   });
+
+  // 1. IMPROVED SCROLL LOGIC
+  useEffect(() => {
+    // We add a small timeout to allow the modal animation to finish before scrolling
+    if (chatStore.isOpen || messages.length > 0 || isLoading) {
+      setTimeout(() => {
+        scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, [messages, isLoading, chatStore.isOpen]); // Added chatStore.isOpen
 
   const onSend = async () => {
     if (!input.trim()) return;
@@ -68,7 +79,6 @@ export const AIChatModal = () => {
       });
 
       if (!response.ok) {
-        // READ THE ERROR TEXT FROM SERVER
         const errorText = await response.text();
         throw new Error(errorText);
       }
@@ -76,15 +86,12 @@ export const AIChatModal = () => {
       const data = await response.json();
       setMessages((prev) => [...prev, { role: "ai", content: data.answer }]);
     } catch (error: any) {
-      // Show the specific error in the toast
       toast.error(error.message || "AI failed to respond.");
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ... rest of the file (handleKeyDown and Return) is fine
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -105,15 +112,13 @@ export const AIChatModal = () => {
           </DialogTitle>
         </DialogHeader>
 
-        {/* Chat Area */}
-        <ScrollArea className="flex-1 p-6">
+        {/* 2. REPLACED SCROLLAREA WITH NATIVE DIV */}
+        <div className="flex-1 overflow-y-auto p-6">
           <div className="flex flex-col gap-y-4">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground text-sm text-center">
                 <Bot className="h-12 w-12 mb-4 opacity-20" />
                 <p>Ask me anything about this document!</p>
-                <p className="text-xs mt-2">"Summarize this page"</p>
-                <p className="text-xs">"What are the action items?"</p>
               </div>
             )}
 
@@ -164,10 +169,11 @@ export const AIChatModal = () => {
                 </div>
               </div>
             )}
-          </div>
-        </ScrollArea>
 
-        {/* Input Area */}
+            <div ref={scrollRef} className="h-1" />
+          </div>
+        </div>
+
         <div className="p-4 border-t bg-background/50 backdrop-blur-sm">
           <div className="flex gap-x-2">
             <Input
