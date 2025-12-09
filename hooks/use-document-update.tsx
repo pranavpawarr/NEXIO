@@ -9,6 +9,7 @@ export const useDocumentUpdate = (documentId: string) => {
       title?: string;
       content?: string;
       icon?: string | null;
+      coverImage?: string | null;
     }) => {
       const response = await fetch(`/api/documents/${documentId}`, {
         method: "PATCH",
@@ -19,7 +20,12 @@ export const useDocumentUpdate = (documentId: string) => {
         throw new Error("Failed to update");
       }
     },
-    onSuccess: () => {},
+    onSuccess: () => {
+      // 1. UNCOMMENT THIS LINE TO FIX THE "REFRESH NEEDED" BUG
+      queryClient.invalidateQueries({ queryKey: ["document", documentId] });
+
+      toast.success("Saved");
+    },
     onError: () => {
       toast.error("Failed to save changes");
     },

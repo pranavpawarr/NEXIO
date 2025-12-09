@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import { ImageIcon, Smile, X } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 import { Button } from "@/components/ui/button";
-
+import { useCoverImage } from "@/hooks/use-cover-image";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useDocumentUpdate } from "@/hooks/use-document-update";
 
@@ -20,23 +20,18 @@ interface ToolbarProps {
 
 export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  // 1. Initialize the mutation hook
   const updateDocument = useDocumentUpdate(initialData.id);
+  const coverImage = useCoverImage(); // ✅ Initialize the hook
 
-  // 2. Local State for immediate typing updates
   const [value, setValue] = useState(initialData.title);
   const [isEditing, setIsEditing] = useState(false);
 
-  // 3. Debounce the value (Wait 1s after typing stops)
   const debouncedValue = useDebounce(value, 1000);
 
-  // 4. THE FIX: Auto-Save Effect
   useEffect(() => {
     if (debouncedValue !== initialData.title) {
       updateDocument.mutate({ title: debouncedValue });
     }
-    // We only want this to run when the USER changes the text.
   }, [debouncedValue]);
 
   const onRemoveIcon = () => {
@@ -92,7 +87,7 @@ export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
         )}
         {!initialData.coverImage && !preview && (
           <Button
-            onClick={() => {}}
+            onClick={coverImage.onOpen} // ✅ Changed from () => {}
             className="text-muted-foreground text-xs"
             variant="outline"
             size="sm"

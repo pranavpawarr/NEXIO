@@ -8,6 +8,7 @@ import { Toolbar } from "../../../../../app/(main)/_components/toolbar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useDocumentUpdate } from "@/hooks/use-document-update";
+import { Cover } from "@/components/cover";
 
 export default function DocumentIdPage() {
   const params = useParams();
@@ -39,9 +40,9 @@ export default function DocumentIdPage() {
       if (!res.ok) throw new Error("Failed to fetch");
       return res.json();
     },
-    staleTime: 0, // Data is immediately considered old
-    refetchOnMount: true, // Always refetch when visiting page
-    refetchOnWindowFocus: false, // Optional: prevents flicker when alt-tabbing
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 
   const [content, setContent] = useState<string | undefined>(undefined);
@@ -56,17 +57,13 @@ export default function DocumentIdPage() {
 
   // 3. AUTO-SAVE LOGIC
   useEffect(() => {
-    // Block saving if data isn't ready
     if (debouncedContent === undefined || document === undefined) return;
 
-    // Block saving if we are currently fetching new data (Prevents overwrite race conditions)
     if (isRefetching || isLoading) return;
 
-    // Save only if different
     if (debouncedContent !== document.content) {
       updateDocument.mutate({ content: debouncedContent });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedContent]);
 
   if (isLoading || isRefetching || document === undefined) {
@@ -89,9 +86,10 @@ export default function DocumentIdPage() {
     );
   }
 
-  // 5. RENDER THE EDITOR (Only happens when data is fresh)
   return (
     <div className="pb-40">
+      <Cover url={document.coverImage} />
+
       <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
         <Toolbar initialData={document} />
         <Editor

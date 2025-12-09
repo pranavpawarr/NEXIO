@@ -4,6 +4,8 @@ import "./globals.css";
 import "@blocknote/mantine/style.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { EdgeStoreProvider } from "@/lib/edgestore";
+import { CoverImageModal } from "@/components/modals/cover-image-modal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,8 +27,14 @@ export default function RootLayout({
       <body className={inter.className}>
         <ClerkProvider>
           <QueryProvider>
-            <Toaster position="bottom-center" />
-            {children}
+            <EdgeStoreProvider>
+              <Toaster position="bottom-center" />
+
+              {/* 2. PLACE IT HERE (Must be inside Body) */}
+              <CoverImageModal />
+
+              {children}
+            </EdgeStoreProvider>
           </QueryProvider>
         </ClerkProvider>
       </body>

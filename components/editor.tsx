@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { PartialBlock } from "@blocknote/core";
+import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -18,8 +18,8 @@ const Editor = ({ onChange, initialContent, editable }: EditorProps) => {
   const parsedContent = useCreateBlockNote({
     initialContent: initialContent
       ? typeof initialContent === "string"
-        ? (JSON.parse(initialContent) as PartialBlock[]) // If string, parse it
-        : (initialContent as unknown as PartialBlock[]) // If already object, use it
+        ? (JSON.parse(initialContent) as PartialBlock[])
+        : (initialContent as unknown as PartialBlock[])
       : undefined,
   });
 
@@ -28,7 +28,7 @@ const Editor = ({ onChange, initialContent, editable }: EditorProps) => {
   }
 
   return (
-    <div className="-mx-[54px] my-4 bg-white dark:bg-[#1F1F1F] p-4">
+    <div className="bg-white dark:bg-[#1F1F1F]">
       <BlockNoteView
         editor={parsedContent}
         theme={resolvedTheme === "dark" ? "dark" : "light"}
@@ -36,6 +36,7 @@ const Editor = ({ onChange, initialContent, editable }: EditorProps) => {
         onChange={() => {
           onChange(JSON.stringify(parsedContent.document));
         }}
+        className="pl-[54px] pr-[54px]"
       />
     </div>
   );
