@@ -1,6 +1,7 @@
 import { Toaster } from "sonner";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "@blocknote/mantine/style.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { QueryProvider } from "@/components/providers/query-provider";
 
