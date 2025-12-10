@@ -20,11 +20,7 @@ export const useArchiveDocument = () => {
       return await response.json();
     },
     onSuccess: () => {
-      // 1. FORCE REFRESH SIDEBAR
       queryClient.invalidateQueries({ queryKey: ["documents"] });
-
-      // 2. Redirect if we are currently on the deleted page
-      // (Optional logic, but good UX)
 
       toast.success("Note moved to trash");
     },

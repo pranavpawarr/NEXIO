@@ -24,7 +24,6 @@ export default async function MarketingPage() {
         </h3>
 
         <div className="flex items-center justify-center gap-x-2">
-          {/* The Login Button is now here */}
           <SignInButton mode="modal">
             <Button size="lg" className="font-bold">
               Enter Nexio

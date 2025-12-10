@@ -27,7 +27,6 @@ export default function HomePage() {
     },
   });
 
-  // Get current time for greeting
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good Morning";
@@ -56,7 +55,6 @@ export default function HomePage() {
   return (
     <div className="flex-1 h-full overflow-y-auto bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-[#1F1F1F] dark:to-[#161616]">
       <div className="max-w-7xl mx-auto p-6 md:p-8 lg:p-12">
-        {/* Header Section */}
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-6 h-6 text-amber-500" />
@@ -69,9 +67,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Total Documents Card */}
           <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
             <FileText className="w-8 h-8 mb-3 opacity-90" />
@@ -81,7 +77,6 @@ export default function HomePage() {
             <p className="text-3xl font-bold">{data?.documents.length || 0}</p>
           </div>
 
-          {/* Pending Tasks Card */}
           <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
             <CheckCircle2 className="w-8 h-8 mb-3 opacity-90" />
@@ -89,7 +84,6 @@ export default function HomePage() {
             <p className="text-3xl font-bold">{data?.tasks.length || 0}</p>
           </div>
 
-          {/* Productivity Card */}
           <div className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
             <TrendingUp className="w-8 h-8 mb-3 opacity-90" />
@@ -100,9 +94,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Documents Section */}
           <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -146,7 +138,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Tasks Section */}
           <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -202,7 +193,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Quick Actions */}
         <div className="mt-6 p-6 bg-gradient-to-r from-neutral-100 to-neutral-50 dark:from-neutral-900 dark:to-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700">
           <h3 className="text-sm font-semibold text-muted-foreground mb-3">
             QUICK ACTIONS
