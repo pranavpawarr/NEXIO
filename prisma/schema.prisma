@@ -67,24 +67,26 @@ model Document {
 }
 
 model Task {
-  id           String   @id @default(uuid()) @db.Uuid 
-  content      String
-  isDone       Boolean  @default(false)
-  priority     String   @default("MEDIUM")
+  id              String   @id @default(uuid()) @db.Uuid 
+  content         String
+  isDone          Boolean  @default(false)
+  priority        String   @default("MEDIUM")
 
-  // Geo-Location fields
-  latitude     Float?
-  longitude    Float?
-  locationName String?
+  latitude        Float?
+  longitude       Float?
+  locationName    String?
 
-  documentId   String   @db.Uuid 
-  document     Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  calendarEventId String?
 
-  userId       String   
+  documentId      String   @db.Uuid 
+  document        Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  userId          String   
   
-  createdAt    DateTime @default(now())
+  createdAt       DateTime @default(now())
   
   @@index([userId])
   @@index([documentId])
+  @@index([calendarEventId])
   @@map("tasks") 
 }

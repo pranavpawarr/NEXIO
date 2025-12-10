@@ -11,6 +11,8 @@ import {
   ArrowUpDown,
   ChevronDown,
   ChevronRight,
+  CalendarPlus,
+  CalendarCheck,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -41,6 +43,7 @@ interface Task {
   isDone: boolean;
   priority: string;
   documentId: string;
+  calendarEventId?: string | null;
   document?: { title: string };
   createdAt: string;
 }
@@ -51,7 +54,7 @@ export default function TasksPage() {
   const [localTasks, setLocalTasks] = useState<Task[]>([]);
   const [sortType, setSortType] = useState<"date" | "priority">("date");
   const [isLocLoading, setIsLocLoading] = useState(false);
-  const [showCompleted, setShowCompleted] = useState(true); // Toggle for completed section
+  const [showCompleted, setShowCompleted] = useState(true);
 
   // Create Modal State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -162,6 +165,31 @@ export default function TasksPage() {
     );
   };
 
+  const calendarMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const res = await fetch(`/api/tasks/${taskId}/calendar`, {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        // 1. Check if the response is HTML (Error Page) instead of Text/JSON
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("text/html")) {
+          throw new Error("API Route not found (Check file structure)");
+        }
+
+        const text = await res.text();
+        throw new Error(text || "Failed to sync");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast.success("Added to Google Calendar!");
+      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
   // Toggle Task - Updates Local State Instantly
   const toggleTask = useMutation({
     mutationFn: async (task: Task) => {
@@ -171,7 +199,6 @@ export default function TasksPage() {
       });
     },
     onSuccess: (_, variables) => {
-      // Optimistic Update: Move task between lists immediately
       setLocalTasks((prev) =>
         prev.map((t) =>
           t.id === variables.id ? { ...t, isDone: !t.isDone } : t
@@ -280,6 +307,8 @@ export default function TasksPage() {
               key={task.id}
               task={task}
               onToggle={() => toggleTask.mutate(task)}
+              onAddToCalendar={() => calendarMutation.mutate(task.id)}
+              isCalendarPending={calendarMutation.isPending}
             />
           ))}
         </div>
@@ -306,6 +335,8 @@ export default function TasksPage() {
                     key={task.id}
                     task={task}
                     onToggle={() => toggleTask.mutate(task)}
+                    onAddToCalendar={() => calendarMutation.mutate(task.id)}
+                    isCalendarPending={calendarMutation.isPending}
                   />
                 ))}
               </div>
@@ -317,8 +348,18 @@ export default function TasksPage() {
   );
 }
 
-// Sub-component for cleaner code
-function TaskItem({ task, onToggle }: { task: Task; onToggle: () => void }) {
+// Updated TaskItem Component
+function TaskItem({
+  task,
+  onToggle,
+  onAddToCalendar,
+  isCalendarPending,
+}: {
+  task: Task;
+  onToggle: () => void;
+  onAddToCalendar: () => void;
+  isCalendarPending: boolean;
+}) {
   return (
     <div className="group flex items-center p-4 border rounded-lg bg-card hover:shadow-md transition">
       <button onClick={onToggle} className="mr-4">
@@ -364,6 +405,26 @@ function TaskItem({ task, onToggle }: { task: Task; onToggle: () => void }) {
           )}
         </div>
       </div>
+
+      {/* GOOGLE CALENDAR BUTTON */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="opacity-0 group-hover:opacity-100 transition h-8 w-8 ml-2"
+        onClick={onAddToCalendar}
+        disabled={!!task.calendarEventId || isCalendarPending}
+        title={
+          task.calendarEventId
+            ? "Already in Google Calendar"
+            : "Add to Google Calendar"
+        }
+      >
+        {task.calendarEventId ? (
+          <CalendarCheck className="h-4 w-4 text-green-600" />
+        ) : (
+          <CalendarPlus className="h-4 w-4 text-muted-foreground hover:text-blue-600 transition" />
+        )}
+      </Button>
     </div>
   );
 }

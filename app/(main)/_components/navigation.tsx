@@ -29,9 +29,11 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { useCreateDocument } from "@/hooks/use-create-document";
+import { useSearch } from "@/hooks/use-search";
 
 export const Navigation = () => {
   const router = useRouter();
+  const search = useSearch();
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const createDocument = useCreateDocument();
@@ -153,7 +155,12 @@ export const Navigation = () => {
 
         {/* SYSTEM MENU */}
         <div className="mt-4">
-          <Item label="Search" icon={Search} isSearch onClick={() => {}} />
+          <Item
+            label="Search"
+            icon={Search}
+            isSearch
+            onClick={search.onOpen} // <--- Add this!
+          />{" "}
           <Item
             label="Home"
             icon={Home}
