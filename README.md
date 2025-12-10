@@ -1,13 +1,8 @@
-Here is a professional, comprehensive README.md for your project. You can copy-paste this directly into your repository.
-
 ✦ Nexio
 
 The connected workspace where better, faster work happens.
 
 Nexio is a full-stack, production-grade productivity application inspired by Notion. It goes beyond simple note-taking by integrating Artificial Intelligence, Geo-Location, and Google Calendar sync to transform how you manage your life and work.
-
-![alt text](https://github.com/user-attachments/assets/placeholder-image)
-<!-- You can replace this with a screenshot of your app later -->
 
 🚀 Features
 📝 Core Workspace
