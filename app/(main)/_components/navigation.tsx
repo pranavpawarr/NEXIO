@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/popover";
 import { useCreateDocument } from "@/hooks/use-create-document";
 import { useSearch } from "@/hooks/use-search";
+import { TrashBox } from "./trash-box";
 
 export const Navigation = () => {
   const router = useRouter();
@@ -221,11 +222,9 @@ export const Navigation = () => {
             </PopoverTrigger>
             <PopoverContent
               side={isMobile ? "bottom" : "right"}
-              className="p-0 w-72"
+              className="p-0 w-72 bg-white dark:bg-[#1F1F1F]" // Added bg color fix
             >
-              <div className="text-sm text-center p-2 text-muted-foreground">
-                Trash is empty
-              </div>
+              <TrashBox />
             </PopoverContent>
           </Popover>
         </div>
