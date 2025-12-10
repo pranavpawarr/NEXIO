@@ -4,7 +4,7 @@ import { createEdgeStoreNextHandler } from "@edgestore/server/adapters/next/app"
 const es = initEdgeStore.create();
 
 const edgeStoreRouter = es.router({
-  publicFiles: es.imageBucket().beforeDelete(({ ctx, fileInfo }) => {
+  publicFiles: es.imageBucket().beforeDelete(({ fileInfo }) => {
     console.log("Deleting:", fileInfo);
     return true;
   }),
