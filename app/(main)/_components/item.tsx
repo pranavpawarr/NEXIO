@@ -8,13 +8,20 @@ import {
   Plus,
   Trash,
 } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCreateDocument } from "@/hooks/use-create-document";
+import { useArchiveDocument } from "@/hooks/use-archive-document";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 interface ItemProps {
   id?: string;
@@ -43,33 +50,34 @@ export const Item = ({
 }: ItemProps) => {
   const { user } = useUser();
   const router = useRouter();
+  const createDocument = useCreateDocument();
+  const archiveDocument = useArchiveDocument();
   const ChevronIcon = expanded ? ChevronDown : ChevronRight;
 
-  // Function to create a nested child document
+  const onArchive = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    event.stopPropagation();
+    if (!id) return;
+
+    archiveDocument.mutate(id);
+  };
+
   const onCreate = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     if (!id) return;
 
-    const promise = fetch("/api/documents", {
-      method: "POST",
-      body: JSON.stringify({ title: "Untitled", parentDocumentId: id }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed");
-        return res.json();
-      })
-      .then((document) => {
-        if (!expanded) {
-          onExpand?.();
-        }
-        // router.push(`/documents/${document.id}`); // Optional: Open immediately
-      });
-
-    toast.promise(promise, {
-      loading: "Creating a new nested note...",
-      success: "New nested note created!",
-      error: "Failed to create new note.",
-    });
+    createDocument.mutate(
+      {
+        title: "Untitled",
+        parentDocumentId: id,
+      },
+      {
+        onSuccess: () => {
+          if (!expanded) {
+            onExpand?.();
+          }
+        },
+      }
+    );
   };
 
   return (
@@ -78,15 +86,14 @@ export const Item = ({
       role="button"
       style={{ paddingLeft: level ? `${level * 12 + 12}px` : "12px" }}
       className={cn(
-        "group min-h-[27px] text-sm py-1 pr-3 w-full hover:bg-primary/5 flex items-center text-muted-foreground font-medium transition",
-        active && "bg-primary/5 text-primary"
+        "group min-h-[27px] text-sm py-1 pr-3 w-full hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center text-muted-foreground font-medium transition",
+        active && "bg-neutral-100 dark:bg-neutral-800 text-primary"
       )}
     >
-      {/* Expand/Collapse Chevron (Only for actual docs) */}
       {!!id && (
         <div
           role="button"
-          className="h-full rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600 mr-1"
+          className="h-full rounded-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 mr-1"
           onClick={(e) => {
             e.stopPropagation();
             onExpand?.();
@@ -96,7 +103,6 @@ export const Item = ({
         </div>
       )}
 
-      {/* Main Icon */}
       {documentIcon ? (
         <div className="shrink-0 mr-2 text-[18px]">{documentIcon}</div>
       ) : (
@@ -105,7 +111,6 @@ export const Item = ({
 
       <span className="truncate">{label}</span>
 
-      {/* Action Buttons (Search CMD+K hint or Add Child Button) */}
       {isSearch && (
         <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
           <span className="text-xs">⌘</span>K
@@ -114,11 +119,36 @@ export const Item = ({
 
       {!!id && (
         <div className="ml-auto flex items-center gap-x-2">
-          {/* Add Child Page Button */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <div
+                role="button"
+                className="opacity-0 group-hover:opacity-100 h-full ml-auto rounded-sm hover:bg-neutral-200 dark:hover:bg-neutral-700"
+              >
+                <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-60"
+              align="start"
+              side="right"
+              forceMount
+            >
+              <DropdownMenuItem onClick={onArchive}>
+                <Trash className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <div className="text-xs text-muted-foreground p-2">
+                Last edited by: {user?.fullName}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <div
             role="button"
             onClick={onCreate}
-            className="opacity-0 group-hover:opacity-100 h-full ml-auto rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
+            className="opacity-0 group-hover:opacity-100 h-full ml-auto rounded-sm hover:bg-neutral-200 dark:hover:bg-neutral-700"
           >
             <Plus className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -128,7 +158,6 @@ export const Item = ({
   );
 };
 
-// Skeleton Loader
 Item.Skeleton = function ItemSkeleton({ level }: { level?: number }) {
   return (
     <div

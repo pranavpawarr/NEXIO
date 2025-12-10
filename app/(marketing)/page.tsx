@@ -7,9 +7,8 @@ import { SignInButton } from "@clerk/nextjs";
 export default async function MarketingPage() {
   const { userId } = await auth();
 
-  // If already logged in, go to dashboard
   if (userId) {
-    redirect("/documents");
+    redirect("/home");
   }
 
   return (

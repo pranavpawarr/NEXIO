@@ -21,10 +21,13 @@ export const useDocumentUpdate = (documentId: string) => {
       }
     },
     onSuccess: () => {
-      // 1. UNCOMMENT THIS LINE TO FIX THE "REFRESH NEEDED" BUG
+      // 1. Refresh the Current Document (so the Editor stays synced)
       queryClient.invalidateQueries({ queryKey: ["document", documentId] });
 
-      toast.success("Saved");
+      // 2. THIS FIXES YOUR BUG: Refresh the Sidebar List (so the Title updates there too)
+      queryClient.invalidateQueries({ queryKey: ["documents"] });
+
+      // We removed the toast here to avoid spamming "Saved" while typing
     },
     onError: () => {
       toast.error("Failed to save changes");

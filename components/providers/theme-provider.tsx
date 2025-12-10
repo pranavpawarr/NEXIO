@@ -1,18 +1,10 @@
-/**
- * THEME PROVIDER COMPONENT
- *
- * Provides theme context for the entire application.
- * Handles dark/light mode toggling.
- *
- * Features:
- * - Dark mode / Light mode toggle
- * - Persists user theme preference (localStorage)
- * - Wraps the entire app
- * - Used in root layout.tsx
- *
- * Libraries:
- * - next-themes (recommended for Next.js)
- * - Tailwind CSS (for styling)
- *
- * Location: components/providers/theme-provider.tsx
- */
+"use client";
+
+import * as React from "react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+// @ts-ignore
+import { type ThemeProviderProps } from "next-themes/dist/types";
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+}

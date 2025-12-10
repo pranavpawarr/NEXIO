@@ -5,14 +5,19 @@ import {
   ChevronsLeft,
   MenuIcon,
   Plus,
-  PlusCircle,
   Search,
   Settings,
   Trash,
+  Moon,
+  Sun,
+  Home,
+  CheckSquare,
+  Briefcase,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { ElementRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 
 import { UserItem } from "./user-item";
@@ -30,12 +35,18 @@ export const Navigation = () => {
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const createDocument = useCreateDocument();
+  const { setTheme, theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   const isResizingRef = useRef(false);
-  const sidebarRef = useRef<ElementRef<"aside">>(null);
-  const navbarRef = useRef<ElementRef<"div">>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const navbarRef = useRef<HTMLDivElement>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isMobile) collapse();
@@ -108,7 +119,6 @@ export const Navigation = () => {
       { title: "Untitled" },
       {
         onSuccess: (data) => {
-          // Redirect to the new page immediately
           router.push(`/documents/${data.id}`);
         },
       }
@@ -121,7 +131,7 @@ export const Navigation = () => {
         ref={sidebarRef}
         className={cn(
           "group/sidebar h-full bg-[#FBFBFA] dark:bg-[#1F1F1F] overflow-y-auto relative flex w-60 flex-col z-[40]",
-          "border-r border-neutral-200 dark:border-neutral-700", // ADDED BORDER HERE
+          "border-r border-neutral-200 dark:border-neutral-700",
           isResetting && "transition-all ease-in-out duration-300",
           isMobile && "w-0"
         )}
@@ -136,17 +146,68 @@ export const Navigation = () => {
         >
           <ChevronsLeft className="h-6 w-6" />
         </div>
+
         <div>
           <UserItem />
-          <Item label="Search" icon={Search} isSearch onClick={() => {}} />
-          <Item label="Settings" icon={Settings} onClick={() => {}} />
-          <Item onClick={handleCreate} label="New Page" icon={PlusCircle} />
         </div>
+
+        {/* SYSTEM MENU */}
         <div className="mt-4">
+          <Item label="Search" icon={Search} isSearch onClick={() => {}} />
+          <Item
+            label="Home"
+            icon={Home}
+            onClick={() => router.push("/home")}
+            active={pathname === "/home"}
+          />
+          <Item
+            label="Tasks"
+            icon={CheckSquare}
+            onClick={() => router.push("/tasks")}
+            active={pathname === "/tasks"}
+          />
+          <Item label="Settings" icon={Settings} onClick={() => {}} />
+        </div>
+
+        {/* WORKSPACES SECTION (Placeholder for now, no dummy data) */}
+        <div className="mt-4">
+          <div className="flex items-center justify-between px-3 py-1">
+            <span className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider">
+              Workspaces
+            </span>
+            <div
+              role="button"
+              onClick={() => toast("Workspaces coming in Phase 8!")}
+              className="opacity-0 group-hover/sidebar:opacity-100 h-full ml-auto rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600 p-0.5"
+            >
+              <Plus className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </div>
+          {/* We will render real workspaces here later. Empty for now to avoid confusion. */}
+          <div className="flex flex-col">
+            <Item label="Personal" icon={Briefcase} onClick={() => {}} active />
+          </div>
+        </div>
+
+        {/* PAGES SECTION */}
+        <div className="mt-4">
+          <div className="flex items-center justify-between px-3 py-1">
+            <span className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider">
+              Pages
+            </span>
+            <div
+              role="button"
+              onClick={handleCreate}
+              className="opacity-0 group-hover/sidebar:opacity-100 h-full ml-auto rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600 p-0.5"
+            >
+              <Plus className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </div>
+
           <DocumentList />
+
           <Item onClick={handleCreate} icon={Plus} label="Add a page" />
 
-          {/* TRASH BOX WOULD GO HERE */}
           <Popover>
             <PopoverTrigger className="w-full mt-4">
               <Item label="Trash" icon={Trash} />
@@ -162,7 +223,24 @@ export const Navigation = () => {
           </Popover>
         </div>
 
-        {/* Resize Handle */}
+        {/* THEME TOGGLE */}
+        <div className="mt-auto p-3">
+          {mounted && (
+            <div
+              role="button"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="flex items-center gap-x-2 p-2 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-700 text-sm font-medium text-muted-foreground cursor-pointer transition"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+              <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+            </div>
+          )}
+        </div>
+
         <div
           onMouseDown={handleMouseDown}
           onClick={resetWidth}
@@ -170,7 +248,6 @@ export const Navigation = () => {
         />
       </aside>
 
-      {/* Mobile Navbar */}
       <div
         ref={navbarRef}
         className={cn(

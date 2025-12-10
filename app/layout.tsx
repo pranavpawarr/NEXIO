@@ -4,6 +4,7 @@ import "./globals.css";
 import "@blocknote/mantine/style.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { EdgeStoreProvider } from "@/lib/edgestore";
 import { CoverImageModal } from "@/components/modals/cover-image-modal";
 import { AIChatModal } from "@/components/modals/ai-chat-modal";
@@ -29,12 +30,17 @@ export default function RootLayout({
         <ClerkProvider>
           <QueryProvider>
             <EdgeStoreProvider>
-              <Toaster position="bottom-center" />
-
-              <AIChatModal />
-              <CoverImageModal />
-
-              {children}
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <Toaster position="bottom-center" />
+                <AIChatModal />
+                <CoverImageModal />
+                {children}
+              </ThemeProvider>
             </EdgeStoreProvider>
           </QueryProvider>
         </ClerkProvider>
